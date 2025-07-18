@@ -1,0 +1,82 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+
+spring:
+  application:
+    name: pokemon-api
+  
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pokemon_db
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        show_sql: false
+    show-sql: false
+  
+  # Cache Configuration
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=300s
+  
+  # Jackson Configuration
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: non_null
+
+# Pokemon API Configuration
+pokemon:
+  api:
+    base-url: https://pokeapi.co/api/v2
+    timeout: 30s
+
+# Logging Configuration
+logging:
+  level:
+    com.pokemon: INFO
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/pokemon-api.log
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers,cache
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+
+# OpenAPI Documentation
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+  info:
+    title: Pokémon API
+    description: API para gestión de Pokémon con arquitectura limpia
+    version: 1.0.0
+    contact:
+      name: Pokemon API Team
+      email: pokemon-api@example.com

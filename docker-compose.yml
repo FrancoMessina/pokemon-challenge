@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: pokemon-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pokemon_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - pokemon-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pokemon_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Aplicación Pokemon API
+  pokemon-api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: pokemon-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      # Base de datos
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/pokemon_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      
+      # JPA/Hibernate
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: false
+      
+      # PokeAPI
+      POKEMON_API_BASE_URL: https://pokeapi.co/api/v2
+      POKEMON_API_TIMEOUT: 30s
+      
+      # Cache
+      SPRING_CACHE_TYPE: caffeine
+      SPRING_CACHE_CAFFEINE_SPEC: maximumSize=500,expireAfterWrite=300s
+      
+      # Logging
+      LOGGING_LEVEL_COM_POKEMON: INFO
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
+      
+      # Actuator
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics,cache
+      
+      # JVM
+      JVM_OPTS: -Xms512m -Xmx1g -XX:+UseG1GC
+    volumes:
+      - app_logs:/app/logs
+    networks:
+      - pokemon-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Adminer para gestión de BD (opcional)
+  adminer:
+    image: adminer:4.8.1
+    container_name: pokemon-adminer
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: dracula
+    networks:
+      - pokemon-network
+
+# Volúmenes persistentes
+volumes:
+  postgres_data:
+    driver: local
+    name: pokemon_postgres_data
+  app_logs:
+    driver: local
+    name: pokemon_app_logs
+
+# Red personalizada
+networks:
+  pokemon-network:
+    driver: bridge
+    name: pokemon-network 
