@@ -310,38 +310,6 @@ grep ERROR logs/pokemon-api.log
 curl localhost:8080/api/v1/actuator/cache
 ```
 
-## 📈 Roadmap
 
-- [ ] **Autenticación JWT** - Sistema de usuarios y roles
-- [ ] **Rate Limiting** - Límites de requests por IP
-- [ ] **WebSocket** - Notificaciones en tiempo real
-- [ ] **GraphQL** - API alternativa con GraphQL
-- [ ] **Kubernetes** - Despliegue en cluster
-- [ ] **CI/CD** - Pipeline automatizado
-- [ ] **Monitoring** - Prometheus + Grafana
 
-## 🤝 Contribución
-
-1. Fork del proyecto
-2. Crear rama feature (`git checkout -b feature/nueva-caracteristica`)
-3. Commit cambios (`git commit -am 'Agregar nueva característica'`)
-4. Push a la rama (`git push origin feature/nueva-caracteristica`)
-5. Crear Pull Request
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
-
-## 👥 Autores
-
-- **Pokemon API Team** - *Desarrollo inicial* - [GitHub](https://github.com/pokemon-api-team)
-
-## 🙏 Agradecimientos
-
-- [PokeAPI](https://pokeapi.co/) - Por proporcionar la API externa de Pokémon
-- [Spring Boot](https://spring.io/projects/spring-boot) - Framework principal
-- [Caffeine](https://github.com/ben-manes/caffeine) - Sistema de cache
-- [MapStruct](https://mapstruct.org/) - Mapeo entre objetos
-
----
 ⭐ **¡Dale una estrella si te gusta el proyecto!** ⭐ 
